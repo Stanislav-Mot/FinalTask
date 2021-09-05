@@ -1,0 +1,35 @@
+plugins {
+    id 'io.qameta.allure' version '2.8.1'
+    id 'java'
+}
+
+allure {
+    version = '2.14.0'
+}
+
+group 'org.selenide'
+version 'LATEST'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '4.4.3'
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.6.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.6.2")
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.6.2'
+    testImplementation group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.7.0'
+    implementation group: 'com.codeborne', name: 'selenide', version: '5.20.4'
+    testImplementation group: 'io.qameta.allure', name: 'allure-junit5', version: '2.13.3'
+    testImplementation group: 'io.qameta.allure', name: 'allure-selenide', version: '2.13.3'
+    implementation group: 'io.qameta.allure', name: 'allure-java-commons', version: '2.13.3'
+    compile group: 'log4j', name: 'log4j', version: '1.2.17'
+}
+
+apply plugin: 'java'
+test {
+    useJUnitPlatform()
+}
