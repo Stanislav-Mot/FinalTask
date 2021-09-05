@@ -4,7 +4,7 @@ import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import pages.*;
 
 import java.io.File;
@@ -92,57 +92,53 @@ public class OrangeHRMTests extends BaseWebTest {
         );
     }
 
-    @Nested
-    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    class User {
 
-        @Severity(SeverityLevel.CRITICAL)
-        @Description("Adding user")
-        @Test
-        @Order(1)
-        public void addUserTest() {
-            ViewSystemUserIDPage viewSystemUserIDPage = new ViewSystemUserIDPage();
-            loginPage.loginToTheSite("login", "password");
-            orangeHRMLivePage.clickUsersButton()
-                    .clickAddUser()
-                    .enterUserData(USER_ROLE, EMPLOYEE_NAME, USER_NAME, STATUS, PASSWORD, PASSWORD)
-                    .clickSave()
-                    .enterNameOfUserForSearchCreated(USER_NAME)
-                    .clickSearchButton()
-                    .clickUserCreated(USER_NAME);
-            String userRole = viewSystemUserIDPage.getUserRoleCreated();
-            String employeeName = viewSystemUserIDPage.getEmployeeNameCreated();
-            String userName = viewSystemUserIDPage.getUserNameCreated();
-            String status = viewSystemUserIDPage.getStatusCreated();
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Adding user")
+    @Test
+    @Order(4)
+    public void addUserTest() {
+        ViewSystemUserIDPage viewSystemUserIDPage = new ViewSystemUserIDPage();
+        loginPage.loginToTheSite("login", "password");
+        orangeHRMLivePage.clickUsersButton()
+                .clickAddUser()
+                .enterUserData(USER_ROLE, EMPLOYEE_NAME, USER_NAME, STATUS, PASSWORD, PASSWORD)
+                .clickSave()
+                .enterNameOfUserForSearchCreated(USER_NAME)
+                .clickSearchButton()
+                .clickUserCreated(USER_NAME);
+        String userRole = viewSystemUserIDPage.getUserRoleCreated();
+        String employeeName = viewSystemUserIDPage.getEmployeeNameCreated();
+        String userName = viewSystemUserIDPage.getUserNameCreated();
+        String status = viewSystemUserIDPage.getStatusCreated();
 
-            Assertions.assertAll("Checking the correctness of the fields",
-                    () -> assertEquals(userRole, USER_ROLE,
-                            "The data doesn't match in the 'user role' field"),
-                    () -> assertEquals(employeeName, EMPLOYEE_NAME,
-                            "The data doesn't match in the 'employee name' field"),
-                    () -> assertEquals(userName, USER_NAME,
-                            "The data doesn't match in the 'user name' field"),
-                    () -> assertEquals(status, STATUS,
-                            "The data doesn't match in the 'status' field")
-            );
-        }
+        Assertions.assertAll("Checking the correctness of the fields",
+                () -> assertEquals(userRole, USER_ROLE,
+                        "The data doesn't match in the 'user role' field"),
+                () -> assertEquals(employeeName, EMPLOYEE_NAME,
+                        "The data doesn't match in the 'employee name' field"),
+                () -> assertEquals(userName, USER_NAME,
+                        "The data doesn't match in the 'user name' field"),
+                () -> assertEquals(status, STATUS,
+                        "The data doesn't match in the 'status' field")
+        );
+    }
 
-        @Severity(SeverityLevel.CRITICAL)
-        @Description("Deleting user")
-        @Test
-        @Order(2)
-        public void deleteUserTest() {
-            loginPage.loginToTheSite("login", "password");
-            orangeHRMLivePage.clickUsersButton()
-                    .enterNameOfUserForSearchCreated(USER_NAME)
-                    .clickSearchButton()
-                    .clickDeleteUser()
-                    .enterNameOfUserForSearchCreated(USER_NAME)
-                    .clickSearchButton();
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Deleting user")
+    @Test
+    @Order(5)
+    public void deleteUserTest() {
+        loginPage.loginToTheSite("login", "password");
+        orangeHRMLivePage.clickUsersButton()
+                .enterNameOfUserForSearchCreated(USER_NAME)
+                .clickSearchButton()
+                .clickDeleteUser()
+                .enterNameOfUserForSearchCreated(USER_NAME)
+                .clickSearchButton();
 
-            Assertions.assertTrue(viewSystemUsersPage.getSearchResult().isDisplayed(),
-                    "The user wasn't deleted");
-        }
+        Assertions.assertTrue(viewSystemUsersPage.getSearchResult().isDisplayed(),
+                "The user wasn't deleted");
     }
 
     @Severity(SeverityLevel.MINOR)
@@ -192,49 +188,48 @@ public class OrangeHRMTests extends BaseWebTest {
         );
     }
 
-    @Nested
-    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    class Job {
+    public static Object[] jobTitle() {
+        return new Object[]{WORK, RUN, SPRINT};
+    }
 
-        @Severity(SeverityLevel.CRITICAL)
-        @Description("Adding job title")
-        @ParameterizedTest
-        @ValueSource(strings = {WORK, RUN, SPRINT})
-        @Order(1)
-        public void addJobTitleTest(String job) {
-            SaveJobTitleUserPage saveJobTitleUserPage = new SaveJobTitleUserPage();
-            loginPage.loginToTheSite("login", "password");
-            orangeHRMLivePage.clickJobTitle()
-                    .clickAddJob()
-                    .enterJobFields(job, new File(PICTURE))
-                    .searchAddedJob(job);
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Adding job title")
+    @ParameterizedTest
+    @MethodSource("jobTitle")
+    @Order(8)
+    public void addJobTitleTest(String job) {
+        SaveJobTitleUserPage saveJobTitleUserPage = new SaveJobTitleUserPage();
+        loginPage.loginToTheSite("login", "password");
+        orangeHRMLivePage.clickJobTitle()
+                .clickAddJob()
+                .enterJobFields(job, new File(PICTURE))
+                .searchAddedJob(job);
 
-            Assertions.assertAll("Verifying the correctness of the data",
-                    () -> assertEquals(saveJobTitleUserPage.getJobTitleCreated().getAttribute("value"), job,
-                            "The data didn't match in the 'job title' field"),
-                    () -> assertEquals(saveJobTitleUserPage.getJobDescriptionCreated().getText(), job,
-                            "The data didn't match in the 'job description' field"),
-                    () -> assertEquals(saveJobTitleUserPage.getJobSpecificationCreated().getText(), PICTURE_NAME,
-                            "The data didn't match in the 'job specification' field"),
-                    () -> assertEquals(saveJobTitleUserPage.getNoteCreated().getText(), job,
-                            "The data didn't match in the 'note' field")
-            );
-        }
+        Assertions.assertAll("Verifying the correctness of the data",
+                () -> assertEquals(saveJobTitleUserPage.getJobTitleCreated().getAttribute("value"), job,
+                        "The data didn't match in the 'job title' field"),
+                () -> assertEquals(saveJobTitleUserPage.getJobDescriptionCreated().getText(), job,
+                        "The data didn't match in the 'job description' field"),
+                () -> assertEquals(saveJobTitleUserPage.getJobSpecificationCreated().getText(), PICTURE_NAME,
+                        "The data didn't match in the 'job specification' field"),
+                () -> assertEquals(saveJobTitleUserPage.getNoteCreated().getText(), job,
+                        "The data didn't match in the 'note' field")
+        );
+    }
 
-        @Severity(SeverityLevel.CRITICAL)
-        @Description("Deleting job")
-        @ParameterizedTest
-        @ValueSource(strings = {WORK, RUN, SPRINT})
-        @Order(2)
-        public void deleteJobTest(String job) {
-            ViewJobTitleListPage viewJobTitleListPage = new ViewJobTitleListPage();
-            loginPage.loginToTheSite("login", "password");
-            orangeHRMLivePage.clickJobTitle()
-                    .deleteJob(job);
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Deleting job")
+    @ParameterizedTest
+    @MethodSource("jobTitle")
+    @Order(9)
+    public void deleteJobTest(String job) {
+        ViewJobTitleListPage viewJobTitleListPage = new ViewJobTitleListPage();
+        loginPage.loginToTheSite("login", "password");
+        orangeHRMLivePage.clickJobTitle()
+                .deleteJob(job);
 
-            Assertions.assertFalse(viewJobTitleListPage.searchDeleteJob(job),
-                    "The deletion didn't happen");
-        }
+        Assertions.assertFalse(viewJobTitleListPage.searchDeleteJob(job),
+                "The deletion didn't happen");
     }
 
     @Severity(SeverityLevel.MINOR)
@@ -252,46 +247,41 @@ public class OrangeHRMTests extends BaseWebTest {
                 "The addition has happened");
     }
 
-    @Nested
-    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    class Candidates {
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Adding candidates")
+    @Test
+    @Order(11)
+    public void addCandidatesTest() {
+        AddCandidateCreatedPage addCandidateCreatedPage = new AddCandidateCreatedPage();
+        loginPage.loginToTheSite("login", "password");
+        orangeHRMLivePage.clickCandidates()
+                .clickAddCandidates()
+                .enterCandidateData(NAME_CANDIDATE, EMAIL_CANDIDATE, new File(TEXT), CONTACT_CANDIDATE);
 
-        @Severity(SeverityLevel.CRITICAL)
-        @Description("Adding candidates")
-        @Test
-        @Order(1)
-        public void addCandidatesTest() {
-            AddCandidateCreatedPage addCandidateCreatedPage = new AddCandidateCreatedPage();
-            loginPage.loginToTheSite("login", "password");
-            orangeHRMLivePage.clickCandidates()
-                    .clickAddCandidates()
-                    .enterCandidateData(NAME_CANDIDATE, EMAIL_CANDIDATE, new File(TEXT), CONTACT_CANDIDATE);
+        Assertions.assertAll("Checking the data",
+                () -> assertEquals(addCandidateCreatedPage.getFirstName().getAttribute(VALUE), NAME_CANDIDATE,
+                        "The data didn't fit in the 'first name' field"),
+                () -> assertEquals(addCandidateCreatedPage.getLastName().getAttribute(VALUE), NAME_CANDIDATE,
+                        "The data didn't fit in the 'last name' field"),
+                () -> assertEquals(addCandidateCreatedPage.getEmail().getAttribute(VALUE), EMAIL_CANDIDATE,
+                        "The data didn't fit in the 'email' field"),
+                () -> assertTrue(addCandidateCreatedPage.getResultAddingCandidate().isDisplayed(),
+                        "Candidate not added")
+        );
+    }
 
-            Assertions.assertAll("Checking the data",
-                    () -> assertEquals(addCandidateCreatedPage.getFirstName().getAttribute(VALUE), NAME_CANDIDATE,
-                            "The data didn't fit in the 'first name' field"),
-                    () -> assertEquals(addCandidateCreatedPage.getLastName().getAttribute(VALUE), NAME_CANDIDATE,
-                            "The data didn't fit in the 'last name' field"),
-                    () -> assertEquals(addCandidateCreatedPage.getEmail().getAttribute(VALUE), EMAIL_CANDIDATE,
-                            "The data didn't fit in the 'email' field"),
-                    () -> assertTrue(addCandidateCreatedPage.getResultAddingCandidate().isDisplayed(),
-                            "Candidate not added")
-            );
-        }
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Delete candidate")
+    @Test
+    @Order(12)
+    public void deleteCandidateTest() {
+        ViewCandidatesPage viewCandidatesPage = new ViewCandidatesPage();
+        loginPage.loginToTheSite("login", "password");
+        orangeHRMLivePage.clickCandidates()
+                .searchCandidate(NAME_CANDIDATE_FOR_SEARCH)
+                .deleteCandidate(NAME_CANDIDATE_FOR_SEARCH);
 
-        @Severity(SeverityLevel.CRITICAL)
-        @Description("Delete candidate")
-        @Test
-        @Order(2)
-        public void deleteCandidateTest() {
-            ViewCandidatesPage viewCandidatesPage = new ViewCandidatesPage();
-            loginPage.loginToTheSite("login", "password");
-            orangeHRMLivePage.clickCandidates()
-                    .searchCandidate(NAME_CANDIDATE_FOR_SEARCH)
-                    .deleteCandidate(NAME_CANDIDATE_FOR_SEARCH);
-
-            Assertions.assertFalse(viewCandidatesPage.searchDeleteCandidate(NAME_CANDIDATE_FOR_SEARCH));
-        }
+        Assertions.assertFalse(viewCandidatesPage.searchDeleteCandidate(NAME_CANDIDATE_FOR_SEARCH));
     }
 
     @Severity(SeverityLevel.MINOR)

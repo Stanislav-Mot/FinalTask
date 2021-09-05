@@ -3,8 +3,8 @@ package utils;
 public class DataTest {
     public static final String USER_ROLE = "Admin";
     public static final String VALUE = "value";
-    public static final String EMPLOYEE_NAME = "Jordan Mathews";
-    public static final String USER_NAME = "Stanislav";
+    public static final String EMPLOYEE_NAME = "Russel Hamilton";
+    public static final String USER_NAME = "Stanislav123";
     public static final String STATUS = "Enabled";
     public static final String PASSWORD = "qwerty123";
     public static final String INCORRECT_USER = "1111";
